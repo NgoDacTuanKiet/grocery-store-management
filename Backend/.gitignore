@@ -1,0 +1,13 @@
+# Bỏ qua cấu hình cá nhân của IDE
+.vscode/
+.idea/
+*.iml
+
+# Bỏ qua file cấu hình chứa mật khẩu
+src/main/resources/application.yaml
+src/main/resources/application.properties
+
+# Bỏ qua các file biên dịch thừa thãi
+target/
+build/
+.settings/
