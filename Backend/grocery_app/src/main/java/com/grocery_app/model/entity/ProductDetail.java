@@ -7,7 +7,8 @@ import java.util.Map;
 
 @Entity
 @Table(name = "variants")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
