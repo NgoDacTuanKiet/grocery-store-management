@@ -22,4 +22,7 @@ public class Category extends BaseModel {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 }

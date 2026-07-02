@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.grocery_app.model.dto.request.CreateCustomerRequest;
 import com.grocery_app.model.dto.response.CustomerResponse;
 import com.grocery_app.model.entity.Customer;
 import com.grocery_app.repository.CustomerRepository;
@@ -21,7 +22,7 @@ public class CustomerService extends GetListPageableService <Customer, CustomerR
     }
     
     @Transactional(rollbackFor = Exception.class)
-    public CustomerResponse createCustomer(com.grocery_app.model.dto.request.CreateCustomerRequest request) {
+    public CustomerResponse createCustomer(CreateCustomerRequest request) {
         if(customerRepository.findByPhone(request.getPhone()).isPresent()) {
             throw new RuntimeException("Số điện thoại đã tồn tại trong hệ thống, vui lòng kiểm tra lại!");
         }
