@@ -5,7 +5,7 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-class ProductDetailRequest {
+public class ProductDetailRequest {
     private Map<String, String> attributes; // VD: {"Khối lượng": "500g"}
     private Double price;
     private Double costPrice;

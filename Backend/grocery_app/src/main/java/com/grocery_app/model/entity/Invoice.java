@@ -9,7 +9,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "invoices")
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

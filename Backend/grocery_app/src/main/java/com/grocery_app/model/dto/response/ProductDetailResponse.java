@@ -5,7 +5,7 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-class ProductDetailResponse {
+public class ProductDetailResponse {
     private Long id;
     private Map<String, String> attributes;
     private Double price;
