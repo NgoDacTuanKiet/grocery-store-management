@@ -16,7 +16,7 @@ public class Customer extends BaseModel {
     private String fullName;
 
     @Column(unique = true, nullable = false)
-    private String phoneNumber;
+    private String phone;
 
     @Builder.Default
     private Double totalDebt = 0.0;

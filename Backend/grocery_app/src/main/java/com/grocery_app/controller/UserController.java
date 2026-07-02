@@ -101,7 +101,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping
+    @PostMapping("create")
     @PreAuthorize("hasRole('OWNER')") // Chỉ có Chủ cửa hàng mới được truy cập bấm nút tạo
     public ResponseDto<UserResponse> createStaff(@RequestBody CreateUserRequest request) {
         
