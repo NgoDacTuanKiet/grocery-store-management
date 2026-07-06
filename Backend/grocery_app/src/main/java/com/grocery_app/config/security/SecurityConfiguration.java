@@ -23,10 +23,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
-
-import static org.springframework.http.HttpMethod.OPTIONS;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -44,20 +46,21 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             .csrf(AbstractHttpConfigurer::disable)
             
             // TÍNH NĂNG MỚI (Học từ mẫu): Bắt lỗi Auth và trả về JSON chuẩn
             .exceptionHandling(exception -> exception
                 // 1. Lỗi 401: Chưa đăng nhập, không có Token, hoặc Token sai/hết hạn
                 .authenticationEntryPoint((request, response, authException) ->
-                    writeAuthError(response, HttpStatus.UNAUTHORIZED, "Vui lòng đăng nhập để tiếp tục (Lỗi 401)"))
+                    writeAuthError(response, HttpStatus.UNAUTHORIZED, "Vui lòng đăng nhập để tiếp tục"))
                     
                 // 2. Lỗi 403: Đã đăng nhập nhưng không đủ quyền (VD: STAFF cố vào trang của OWNER)
                 .accessDeniedHandler((request, response, accessDeniedException) ->
-                    writeAuthError(response, HttpStatus.FORBIDDEN, "Bạn không có quyền truy cập chức năng này (Lỗi 403)")))
+                    writeAuthError(response, HttpStatus.FORBIDDEN, "Bạn không có quyền truy cập chức năng này")))
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(OPTIONS).permitAll() // Bắt buộc mở CORS OPTIONS để Frontend có thể gọi API
                 .requestMatchers(
                     "/api/auth/**" // Mở API đăng nhập
                     // Bạn có thể mở thêm Swagger API-docs ở đây nếu muốn sau này
@@ -71,9 +74,7 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    /**
-     * Hàm phụ trợ (Học từ mẫu): Ghi đè response trả về của Spring bằng ResponseDto chuẩn
-     */
+    //Hàm phụ trợ (Học từ mẫu): Ghi đè response trả về của Spring bằng ResponseDto chuẩn
     private void writeAuthError(HttpServletResponse response, HttpStatus httpStatus, String message) throws IOException {
         
         // Tạo DTO báo lỗi
@@ -109,5 +110,26 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Cho phép Frontend Vite ở cổng 5173 truy cập
+        configuration.setAllowedOrigins(List.of("http://localhost:5173","http://127.0.0.1:5173")); 
+        
+        // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE, OPTIONS)
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); 
+        
+        // Cho phép tất cả các Headers
+        configuration.setAllowedHeaders(List.of("*"));
+        
+        // Bắt buộc phải có dòng này nếu có dùng JWT Token hoặc Cookie
+        configuration.setAllowCredentials(true); 
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Áp dụng cấu hình này cho mọi đường dẫn API (/**)
+        source.registerCorsConfiguration("/**", configuration); 
+        return source;
     }
 }
