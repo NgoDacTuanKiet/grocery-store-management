@@ -9,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -23,9 +25,18 @@ public class InvoiceController {
     @PreAuthorize("hasAnyRole('OWNER', 'STAFF')")
     public ResponseDto<List<InvoiceResponse>> getInvoices(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long customerId,
+            @RequestParam(required = false) String status,
             Pageable pageable) {
         // Có thể áp dụng logic lọc: STAFF chỉ xem hóa đơn mình tạo, OWNER xem tất cả
-        return invoiceService.getList(pageable, search);
+        Map<String, Object> filters = new HashMap<>();
+        if (customerId != null) {
+            filters.put("_customerId", customerId);
+        }
+        if (status != null && !status.isEmpty()) {
+            filters.put("_status", status);
+        }
+        return invoiceService.getList(pageable, search, filters);
     }
 
     //Xem chi tiết hóa đơn

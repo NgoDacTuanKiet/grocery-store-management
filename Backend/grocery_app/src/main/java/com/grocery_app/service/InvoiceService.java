@@ -23,7 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Service
 public class InvoiceService extends GetListPageableService<Invoice, InvoiceResponse> {
@@ -68,6 +74,21 @@ public class InvoiceService extends GetListPageableService<Invoice, InvoiceRespo
     @Override
     protected List<String> getSearchFields() {
         return List.of("invoiceCode"); // Tìm kiếm hóa đơn theo mã
+    }
+
+    @Override
+    protected Predicate applyCustomCriteria(String querySearch, Map<String, Object> filters, 
+                                            Root<Invoice> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        List<Predicate> predicates = new ArrayList<>();
+        if (filters != null) {
+            if (filters.containsKey("_customerId") && filters.get("_customerId") != null) {
+                predicates.add(cb.equal(root.get("customer").get("id"), filters.get("_customerId")));
+            }
+            if (filters.containsKey("_status") && filters.get("_status") != null) {
+                predicates.add(cb.equal(root.get("status"), InvoiceStatus.valueOf(filters.get("_status").toString())));
+            }
+        }
+        return predicates.isEmpty() ? null : cb.and(predicates.toArray(new Predicate[0]));
     }
 
     //Lấy chi tiết hóa đơn
