@@ -8,7 +8,8 @@ import {
     ShoppingCartOutlined,
     FileTextOutlined,
     DashboardOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    AppstoreOutlined
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 
@@ -28,6 +29,7 @@ const AdminLayout = () => {
         { key: '/users', icon: <TeamOutlined />, label: 'Quản lý Nhân viên' },
         { key: '/customers', icon: <UserOutlined />, label: 'Khách hàng' },
         { key: '/products', icon: <ShoppingCartOutlined />, label: 'Sản phẩm' },
+        { key: '/categories', icon: <AppstoreOutlined />, label: 'Danh mục' },
         { key: '/invoices', icon: <FileTextOutlined />, label: 'Hóa đơn' },
     ];
 

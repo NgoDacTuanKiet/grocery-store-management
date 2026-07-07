@@ -3,6 +3,9 @@ import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
 import AdminLayout from './components/layout/AdminLayout.jsx';
 import Users from './pages/Users/User.jsx';
+import Customers from './pages/Customers/Customer.jsx';
+import Products from './pages/Products/Product.jsx';
+import Categories from './pages/Categories/Category.jsx';
 
 // Component bảo vệ Route: Nếu chưa có Token thì đá văng ra Login
 const PrivateRoute = ({ children }) => {
@@ -25,8 +28,9 @@ function App() {
             
             {/* Nội dung các trang con (Sẽ hiện vào chỗ <Outlet />) */}
             <Route path="users" element={<Users />} />
-            <Route path="customers" element={<h2>Khu vực Quản lý Khách hàng</h2>} />
-            <Route path="products" element={<h2>Khu vực Quản lý Sản phẩm</h2>} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="products" element={<Products />} />
+            <Route path="categories" element={<Categories />} />
             <Route path="invoices" element={<h2>Khu vực Quản lý Hóa đơn</h2>} />
 
         </Route>
