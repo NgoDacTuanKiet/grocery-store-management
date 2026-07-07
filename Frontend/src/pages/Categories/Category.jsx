@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Table, Card, Button, Space, Input, message } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { categoryApi } from '../../services/categoryApi';
+import CreateCategoryModal from './CreateCategoryModal';
+import UpdateCategoryModal from './UpdateCategoryModal';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 5,
@@ -79,7 +84,16 @@ const Categories = () => {
             width: 150,
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" icon={<EditOutlined />} size="small" ghost onClick={() => message.info('Đang phát triển form sửa')} />
+                    <Button 
+                        type="primary" 
+                        icon={<EditOutlined />} 
+                        size="small" 
+                        ghost 
+                        onClick={() => {
+                            setEditingCategory(record); // Cất dữ liệu dòng này vào state
+                            setIsUpdateModalOpen(true); // Mở popup sửa lên
+                        }} 
+                    />
                     <Button type="primary" danger icon={<DeleteOutlined />} size="small" onClick={() => handleDelete(record.id)} />
                 </Space>
             ),
@@ -99,7 +113,7 @@ const Categories = () => {
                         onChange={(e) => setSearchText(e.target.value)}
                         onPressEnter={handleSearch}
                     />
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => message.info('Đang phát triển form thêm')}>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
                         Thêm Danh mục
                     </Button>
                 </Space>
@@ -113,6 +127,21 @@ const Categories = () => {
                 bordered
                 pagination={pagination} 
                 onChange={handleTableChange} 
+            />
+            <CreateCategoryModal 
+                open={isModalOpen}
+                onCancel={() => setIsModalOpen(false)}
+                onSuccess={() => fetchCategories(1, pagination.pageSize, searchText)}
+            />
+
+            <UpdateCategoryModal
+                open={isUpdateModalOpen}
+                categoryData={editingCategory}
+                onCancel={() => {
+                    setIsUpdateModalOpen(false);
+                    setEditingCategory(null);
+                }}
+                onSuccess={() => fetchCategories(pagination.current, pagination.pageSize, searchText)}
             />
         </Card>
     );

@@ -12,4 +12,5 @@ public class InvoiceRequest {
     private Double paidAmount; // Số tiền khách đưa
     private PaymentMethod paymentMethod;
     private List<InvoiceItemRequest> items; // Danh sách hàng hóa khách mua
+    private CreateCustomerRequest newCustomer;
 }

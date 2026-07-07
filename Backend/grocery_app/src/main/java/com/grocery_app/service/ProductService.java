@@ -48,6 +48,7 @@ public class ProductService extends GetListPageableService<Product, ProductRespo
 
         //Map dữ liệu từ Request sang Entity
         Product product = modelMapper.map(request, Product.class);
+        product.setId(null);
         product.setCategory(category); // Gán danh mục vào sản phẩm
 
         //Gán Product vào từng ProductDetail

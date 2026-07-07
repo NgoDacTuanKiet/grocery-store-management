@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Table, Card, Button, Space, Tag, Input, Badge, message } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { productApi } from '../../services/productApi';
+import CreateProductModal from './CreateProductModal';
 
 const Products = () => {
     // STATE QUẢN LÝ DỮ LIỆU
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -168,7 +170,7 @@ const Products = () => {
                         onChange={(e) => setSearchText(e.target.value)}
                         onPressEnter={handleSearch} 
                     />
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => message.info('Tính năng Thêm đang phát triển')}>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsCreateModalOpen(true)}>
                         Thêm Sản phẩm mới
                     </Button>
                 </Space>
@@ -183,6 +185,11 @@ const Products = () => {
                 pagination={pagination} 
                 onChange={handleTableChange} 
                 expandable={{ expandedRowRender }} 
+            />
+            <CreateProductModal 
+                open={isCreateModalOpen} 
+                onCancel={() => setIsCreateModalOpen(false)} 
+                onSuccess={() => fetchProducts(1, pagination.pageSize, searchText)} 
             />
         </Card>
     );
