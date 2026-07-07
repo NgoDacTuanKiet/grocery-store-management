@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Auth/Login.jsx'; 
 import Register from './pages/Auth/Register.jsx';
 import AdminLayout from './components/layout/AdminLayout.jsx';
+import Users from './pages/Users/User.jsx';
 
 // Component bảo vệ Route: Nếu chưa có Token thì đá văng ra Login
 const PrivateRoute = ({ children }) => {
@@ -23,7 +24,7 @@ function App() {
             <Route index element={<h2>Màn hình Tổng quan Dashboard (Sẽ code sau)</h2>} />
             
             {/* Nội dung các trang con (Sẽ hiện vào chỗ <Outlet />) */}
-            <Route path="users" element={<h2>Khu vực Quản lý Nhân viên</h2>} />
+            <Route path="users" element={<Users />} />
             <Route path="customers" element={<h2>Khu vực Quản lý Khách hàng</h2>} />
             <Route path="products" element={<h2>Khu vực Quản lý Sản phẩm</h2>} />
             <Route path="invoices" element={<h2>Khu vực Quản lý Hóa đơn</h2>} />
