@@ -108,12 +108,17 @@ public abstract class GetListPageableService<E, R>{//E: entity, R: response
                     return; // Bỏ qua các key hệ thống
                 }
                 
+                jakarta.persistence.criteria.Path<Object> path = root.get(key.split("\\.")[0]);
+                for (int i = 1; i < key.split("\\.").length; i++) {
+                    path = path.get(key.split("\\.")[i]);
+                }
+                
                 if (value instanceof String) {
                     // Nếu là chuỗi thì tìm kiếm tương đối (LIKE) không phân biệt hoa thường
-                    predicates.add(cb.like(cb.lower(root.get(key)), "%" + ((String) value).toLowerCase() + "%"));
+                    predicates.add(cb.like(cb.lower(path.as(String.class)), "%" + ((String) value).toLowerCase() + "%"));
                 } else {
                     // Nếu là số/boolean/enum thì tìm kiếm tuyệt đối (EQUAL)
-                    predicates.add(cb.equal(root.get(key), value));
+                    predicates.add(cb.equal(path, value));
                 }
             });
         }

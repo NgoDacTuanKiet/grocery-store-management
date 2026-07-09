@@ -196,7 +196,7 @@ const CreateInvoiceDrawer = ({ open, onClose, onSuccess }) => {
                             prefix={<SearchOutlined />} 
                             style={{ width: 300 }}
                             value={searchProduct}
-                            onChange={(e) => setSearchText(e.target.value)}
+                            onChange={(e) => setSearchProduct(e.target.value)}
                             onPressEnter={() => fetchProducts()}
                         />
                         <Select 

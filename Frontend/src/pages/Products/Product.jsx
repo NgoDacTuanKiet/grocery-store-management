@@ -15,25 +15,25 @@ const Products = () => {
     const [searchText, setSearchText] = useState('');
     const [pagination, setPagination] = useState({
         current: 1,
-        pageSize: 5,
+        pageSize: 10,
         total: 0,
     });
 
     // HÀM FETCH DỮ LIỆU TỪ BACKEND
-    const fetchProducts = async (page = 1, size = 5, search = searchText) => {
+    const fetchProducts = async (page = 1, size = 10, search = searchText) => {
         setLoading(true);
         try {
             const params = {
                 page: page - 1, // Spring Boot đếm từ trang 0
                 size: size,
             };
-            
+
             if (search) {
                 params.search = search;
             }
 
             const response = await productApi.getAll(params);
-            
+
             if (response.success) {
                 const pageData = response.data;
                 const dataList = pageData.content || pageData || [];
@@ -73,17 +73,17 @@ const Products = () => {
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 60, align: 'center' },
         { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name', fontWeight: 'bold' },
-        { 
-            title: 'Danh mục', 
-            dataIndex: 'categoryName', 
+        {
+            title: 'Danh mục',
+            dataIndex: 'categoryName',
             key: 'categoryName',
             render: (text) => text || 'Chưa phân loại'
         },
-        { 
-            title: 'Mô tả', 
-            dataIndex: 'description', 
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
             key: 'description',
-            ellipsis: true, 
+            ellipsis: true,
         },
         {
             title: 'Hành động',
@@ -102,9 +102,9 @@ const Products = () => {
     const expandedRowRender = (record) => {
         const variantColumns = [
             { title: 'Mã CT', dataIndex: 'id', key: 'id', width: 80, align: 'center' },
-            { 
-                title: 'Phân loại (Thuộc tính)', 
-                dataIndex: 'attributes', 
+            {
+                title: 'Phân loại (Thuộc tính)',
+                dataIndex: 'attributes',
                 key: 'attributes',
                 render: (attrs) => {
                     if (!attrs || Object.keys(attrs).length === 0) {
@@ -121,26 +121,26 @@ const Products = () => {
                     );
                 }
             },
-            { 
-                title: 'Giá vốn', 
-                dataIndex: 'costPrice', 
+            {
+                title: 'Giá vốn',
+                dataIndex: 'costPrice',
                 key: 'costPrice',
                 render: (price) => <span style={{ color: '#8c8c8c' }}>{price?.toLocaleString('vi-VN')} đ</span>
             },
-            { 
-                title: 'Giá bán', 
-                dataIndex: 'price', 
+            {
+                title: 'Giá bán',
+                dataIndex: 'price',
                 key: 'price',
                 render: (price) => <span style={{ color: '#f5222d', fontWeight: 600 }}>{price?.toLocaleString('vi-VN')} đ</span>
             },
-            { 
-                title: 'Tồn kho', 
-                dataIndex: 'stockQuantity', 
+            {
+                title: 'Tồn kho',
+                dataIndex: 'stockQuantity',
                 key: 'stockQuantity',
                 render: (stock) => (
-                    <Badge 
-                        status={stock > 0 ? 'success' : 'error'} 
-                        text={stock > 0 ? `${stock} sản phẩm` : 'Hết hàng'} 
+                    <Badge
+                        status={stock > 0 ? 'success' : 'error'}
+                        text={stock > 0 ? `${stock} sản phẩm` : 'Hết hàng'}
                     />
                 )
             },
@@ -148,10 +148,10 @@ const Products = () => {
 
         // Lệnh return bắt buộc phải có để vẽ ra Bảng phụ
         return (
-            <Table 
-                columns={variantColumns} 
-                dataSource={record.productDetails || []} 
-                pagination={false} 
+            <Table
+                columns={variantColumns}
+                dataSource={record.productDetails || []}
+                pagination={false}
                 rowKey="id"
                 size="small"
                 style={{ margin: '10px 0', backgroundColor: '#fafafa' }}
@@ -161,8 +161,8 @@ const Products = () => {
     };
 
     return (
-        <Card 
-            title="Quản lý Sản phẩm & Phân loại" 
+        <Card
+            title="Quản lý Sản phẩm & Phân loại"
             extra={
                 <Space size="large">
                     <Input
@@ -171,7 +171,7 @@ const Products = () => {
                         style={{ width: 250 }}
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
-                        onPressEnter={handleSearch} 
+                        onPressEnter={handleSearch}
                     />
                     <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsCreateModalOpen(true)}>
                         Thêm Sản phẩm mới
@@ -179,24 +179,24 @@ const Products = () => {
                 </Space>
             }
         >
-            <Table 
-                dataSource={products} 
-                columns={columns} 
-                rowKey="id" 
+            <Table
+                dataSource={products}
+                columns={columns}
+                rowKey="id"
                 loading={loading}
                 bordered
-                pagination={pagination} 
-                onChange={handleTableChange} 
-                expandable={{ expandedRowRender }} 
+                pagination={pagination}
+                onChange={handleTableChange}
+                expandable={{ expandedRowRender }}
             />
-            <CreateProductModal 
-                open={isCreateModalOpen} 
-                onCancel={() => setIsCreateModalOpen(false)} 
-                onSuccess={() => fetchProducts(1, pagination.pageSize, searchText)} 
+            <CreateProductModal
+                open={isCreateModalOpen}
+                onCancel={() => setIsCreateModalOpen(false)}
+                onSuccess={() => fetchProducts(1, pagination.pageSize, searchText)}
             />
-            <UpdateProductModal 
-                open={isUpdateModalOpen} 
-                onCancel={() => { setIsUpdateModalOpen(false); setEditingProductId(null); }} 
+            <UpdateProductModal
+                open={isUpdateModalOpen}
+                onCancel={() => { setIsUpdateModalOpen(false); setEditingProductId(null); }}
                 onSuccess={() => fetchProducts(1, pagination.pageSize, searchText)}
                 productId={editingProductId}
             />
