@@ -197,7 +197,8 @@ public class InvoiceService extends GetListPageableService<Invoice, InvoiceRespo
             
             // Tính số nợ mới: Nợ cũ + (Tổng tiền - Đã trả)
             double currentDebt = customer.getTotalDebt() != null ? customer.getTotalDebt() : 0.0;
-            double invoiceDebt = savedInvoice.getTotalAmount() - savedInvoice.getPaidAmount();
+            // Nếu khách đưa dư tiền (paidAmount > totalAmount), tiền thừa được trả lại ngay, không trừ vào nợ cũ
+            double invoiceDebt = Math.max(0, savedInvoice.getTotalAmount() - savedInvoice.getPaidAmount());
             
             customer.setTotalDebt(currentDebt + invoiceDebt);
             

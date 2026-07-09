@@ -62,8 +62,8 @@ public class SecurityConfiguration {
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/api/auth/**" // Mở API đăng nhập
-                    // Bạn có thể mở thêm Swagger API-docs ở đây nếu muốn sau này
+                    "/api/auth/**", // Mở API đăng nhập
+                    "/error"        // Mở endpoint lỗi mặc định của Spring
                 ).permitAll()
                 .anyRequest().authenticated()
             )

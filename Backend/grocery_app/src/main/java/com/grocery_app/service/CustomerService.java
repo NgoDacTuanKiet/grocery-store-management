@@ -21,6 +21,11 @@ public class CustomerService extends GetListPageableService <Customer, CustomerR
         this.modelMapper = modelMapper;
     }
     
+    @Override
+    protected java.util.List<String> getSearchFields() {
+        return java.util.List.of("fullName", "phone");
+    }
+    
     @Transactional(rollbackFor = Exception.class)
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
         if(customerRepository.findByPhone(request.getPhone()).isPresent()) {
