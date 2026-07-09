@@ -115,8 +115,8 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Cho phép Frontend Vite ở cổng 5173 truy cập
-        configuration.setAllowedOrigins(List.of("http://localhost:5173","http://127.0.0.1:5173")); 
+        // Cho phép Frontend Vite ở cổng 5173 và Nginx ở cổng 80 truy cập
+        configuration.setAllowedOrigins(List.of("http://localhost:5173","http://127.0.0.1:5173", "http://localhost", "http://127.0.0.1")); 
         
         // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE, OPTIONS)
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); 
