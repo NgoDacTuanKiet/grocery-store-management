@@ -38,7 +38,7 @@ const Users = () => {
             if (response.success) {
                 const pageData = response.data; 
                 const dataList = pageData.content || pageData || [];
-                const totalItems = pageData.totalElements || dataList.length || 0;
+                const totalItems = response.metaData?.totalItems || dataList.length || 0;
 
                 setUsers(dataList);
                 

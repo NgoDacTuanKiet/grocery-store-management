@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class ProductDetailRequest {
+    private Long id;
     private Map<String, String> attributes; // VD: {"Khối lượng": "500g"}
     private Double price;
     private Double costPrice;

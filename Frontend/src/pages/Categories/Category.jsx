@@ -32,7 +32,7 @@ const Categories = () => {
                 // Tùy thuộc vào Backend trả về Page hay List, bóc tách cho an toàn
                 const pageData = response.data;
                 const dataList = pageData.content || pageData || [];
-                const totalItems = pageData.totalElements || dataList.length || 0;
+                const totalItems = response.metaData?.totalItems || dataList.length || 0;
 
                 setCategories(dataList);
                 setPagination(prev => ({

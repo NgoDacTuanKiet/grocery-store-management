@@ -64,6 +64,64 @@ public class ProductService extends GetListPageableService<Product, ProductRespo
         return mapToResponse(savedProduct);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm!"));
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại!"));
+
+        existingProduct.setName(request.getName());
+        existingProduct.setDescription(request.getDescription());
+        existingProduct.setCategory(category);
+        
+        // Cập nhật thuộc tính chung
+        if (existingProduct.getAttributes() != null) {
+            existingProduct.getAttributes().clear();
+        }
+        if (request.getAttributes() != null) {
+            existingProduct.getAttributes().addAll(request.getAttributes());
+        }
+
+        // Cập nhật ProductDetail (Variants)
+        List<com.grocery_app.model.entity.ProductDetail> existingDetails = existingProduct.getProductDetails();
+        List<com.grocery_app.model.dto.request.ProductDetailRequest> reqDetails = request.getProductDetails();
+        
+        if (reqDetails != null) {
+            // Xóa các variant bị loại bỏ
+            existingDetails.removeIf(existing -> reqDetails.stream()
+                    .noneMatch(req -> req.getId() != null && req.getId().equals(existing.getId())));
+                    
+            // Cập nhật hoặc thêm mới
+            for (var detailReq : reqDetails) {
+                if (detailReq.getId() != null) {
+                    existingDetails.stream()
+                            .filter(e -> e.getId().equals(detailReq.getId()))
+                            .findFirst()
+                            .ifPresent(existing -> {
+                                existing.setPrice(detailReq.getPrice());
+                                existing.setCostPrice(detailReq.getCostPrice());
+                                existing.setStockQuantity(detailReq.getStockQuantity());
+                                existing.getAttributes().clear();
+                                if (detailReq.getAttributes() != null) {
+                                    existing.getAttributes().putAll(detailReq.getAttributes());
+                                }
+                            });
+                } else {
+                    com.grocery_app.model.entity.ProductDetail newDetail = modelMapper.map(detailReq, com.grocery_app.model.entity.ProductDetail.class);
+                    newDetail.setProduct(existingProduct);
+                    existingDetails.add(newDetail);
+                }
+            }
+        } else {
+            existingDetails.clear();
+        }
+
+        Product savedProduct = productRepository.save(existingProduct);
+        return mapToResponse(savedProduct);
+    }
+
     //Hàm map thủ công để lấy được tên Danh mục (Category Name)
     private ProductResponse mapToResponse(Product product) {
         ProductResponse response = modelMapper.map(product, ProductResponse.class);

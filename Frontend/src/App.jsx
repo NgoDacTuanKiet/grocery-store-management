@@ -8,6 +8,7 @@ import Products from './pages/Products/Product.jsx';
 import Categories from './pages/Categories/Category.jsx';
 import Invoices from './pages/Invoices/Invoice.jsx';
 import CustomerDetail from './pages/Customers/CustomerDetail';
+import Dashboard from './pages/Dashboard/Dashboard.jsx';
 
 // Component bảo vệ Route: Nếu chưa có Token thì đá văng ra Login
 const PrivateRoute = ({ children }) => {
@@ -26,7 +27,7 @@ function App() {
         <Route path="/" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
             
             {/* Nội dung trang chủ (Tổng quan) */}
-            <Route index element={<h2>Màn hình Tổng quan Dashboard (Sẽ code sau)</h2>} />
+            <Route index element={<Dashboard />} />
             
             {/* Nội dung các trang con (Sẽ hiện vào chỗ <Outlet />) */}
             <Route path="users" element={<Users />} />

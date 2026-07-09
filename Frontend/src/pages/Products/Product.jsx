@@ -3,10 +3,13 @@ import { Table, Card, Button, Space, Tag, Input, Badge, message } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { productApi } from '../../services/productApi';
 import CreateProductModal from './CreateProductModal';
+import UpdateProductModal from './UpdateProductModal';
 
 const Products = () => {
     // STATE QUẢN LÝ DỮ LIỆU
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [editingProductId, setEditingProductId] = useState(null);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -34,7 +37,7 @@ const Products = () => {
             if (response.success) {
                 const pageData = response.data;
                 const dataList = pageData.content || pageData || [];
-                const totalItems = pageData.totalElements || dataList.length || 0;
+                const totalItems = response.metaData?.totalItems || dataList.length || 0;
 
                 setProducts(dataList);
                 setPagination(prev => ({
@@ -88,7 +91,7 @@ const Products = () => {
             align: 'center',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" icon={<EditOutlined />} size="small" ghost onClick={() => message.info(`Tính năng sửa đang phát triển`)} />
+                    <Button type="primary" icon={<EditOutlined />} size="small" ghost onClick={() => { setEditingProductId(record.id); setIsUpdateModalOpen(true); }} />
                     <Button type="primary" danger icon={<DeleteOutlined />} size="small" onClick={() => message.info(`Tính năng xóa đang phát triển`)} />
                 </Space>
             ),
@@ -190,6 +193,12 @@ const Products = () => {
                 open={isCreateModalOpen} 
                 onCancel={() => setIsCreateModalOpen(false)} 
                 onSuccess={() => fetchProducts(1, pagination.pageSize, searchText)} 
+            />
+            <UpdateProductModal 
+                open={isUpdateModalOpen} 
+                onCancel={() => { setIsUpdateModalOpen(false); setEditingProductId(null); }} 
+                onSuccess={() => fetchProducts(1, pagination.pageSize, searchText)}
+                productId={editingProductId}
             />
         </Card>
     );

@@ -1,0 +1,70 @@
+.dashboard-container {
+    padding: 24px 0;
+}
+
+/* Stat Cards */
+.stat-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: relative;
+    border: none;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    font-size: 48px;
+    position: absolute;
+    right: 24px;
+    bottom: -10px;
+    opacity: 0.15;
+}
+
+.stat-title {
+    color: #8c8c8c;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #141414;
+    margin-bottom: 0;
+}
+
+.stat-card.revenue { border-bottom: 4px solid #52c41a; }
+.stat-card.orders { border-bottom: 4px solid #1890ff; }
+.stat-card.debt { border-bottom: 4px solid #f5222d; }
+.stat-card.stock { border-bottom: 4px solid #faad14; }
+
+/* Chart Area */
+.chart-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    margin-top: 24px;
+}
+
+/* Tables */
+.alert-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    height: 100%;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+/* Timeline/Activities */
+.activity-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}

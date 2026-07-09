@@ -26,7 +26,7 @@ const Customers = () => {
                     ...prev,
                     current: page,
                     pageSize: size,
-                    total: pageData.totalElements || 0,
+                    total: response.metaData?.totalItems || pageData.length || 0,
                 }));
             }
         } catch (error) {

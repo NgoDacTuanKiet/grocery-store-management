@@ -4,40 +4,71 @@ import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { productApi } from '../../services/productApi';
 import { categoryApi } from '../../services/categoryApi';
 
-const CreateProductModal = ({ open, onCancel, onSuccess }) => {
+const UpdateProductModal = ({ open, onCancel, onSuccess, productId }) => {
     const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [loadingData, setLoadingData] = useState(false);
 
-    // Tự động tải danh sách Danh mục (Category) để đưa vào ô Select
+    // Tự động tải danh sách Danh mục và Thông tin sản phẩm
     useEffect(() => {
-        if (open) {
-            const fetchCategories = async () => {
+        if (open && productId) {
+            const fetchData = async () => {
+                setLoadingData(true);
                 try {
-                    const res = await categoryApi.getAll({ size: 100 });
-                    if (res.success) {
-                        setCategories(res.data?.content || res.data || []);
+                    const [catRes, prodRes] = await Promise.all([
+                        categoryApi.getAll({ size: 100 }),
+                        productApi.getById(productId)
+                    ]);
+                    if (catRes.success) {
+                        setCategories(catRes.data?.content || catRes.data || []);
+                    }
+                    if (prodRes.success) {
+                        const product = prodRes.data;
+                        // Transform details to match form structure
+                        const details = (product.productDetails || []).map(detail => {
+                            let vName = 'Mặc định';
+                            let vUnit = 'Cái';
+                            if (detail.attributes) {
+                                vName = detail.attributes["Phân loại"] || detail.attributes["Hương vị"] || detail.attributes["Loại"] || detail.attributes["Trọng lượng"] || Object.values(detail.attributes)[0] || 'Mặc định';
+                                vUnit = detail.attributes["Đơn vị"] || Object.values(detail.attributes)[1] || 'Cái';
+                            }
+                            return {
+                                id: detail.id,
+                                variantName: vName,
+                                unit: vUnit,
+                                costPrice: detail.costPrice,
+                                price: detail.price,
+                                stockQuantity: detail.stockQuantity
+                            };
+                        });
+                        form.setFieldsValue({
+                            name: product.name,
+                            categoryId: product.categoryId,
+                            description: product.description,
+                            details: details.length > 0 ? details : [{ variantName: 'Mặc định', unit: 'Cái', costPrice: 0, price: 0, stockQuantity: 0 }]
+                        });
                     }
                 } catch (error) {
-                    message.error('Không thể tải danh sách danh mục!');
+                    message.error('Không thể tải thông tin sản phẩm!');
+                } finally {
+                    setLoadingData(false);
                 }
             };
-            fetchCategories();
+            fetchData();
         }
-    }, [open]);
+    }, [open, productId, form]);
 
-    const handleCreateProduct = async (values) => {
+    const handleUpdateProduct = async (values) => {
         setSubmitting(true);
         try {
-            // Chuyển đổi dữ liệu form FE thành DTO Backend yêu cầu
             const payload = {
                 name: values.name,
                 categoryId: values.categoryId,
                 description: values.description,
                 attributes: ["Phân loại", "Đơn vị"],
-                // Quét danh sách phân loại và đóng gói lại
                 productDetails: values.details.map(detail => ({
-                    // Map chuỗi Tên phân loại thành Map<String, String> attributes
+                    id: detail.id, // ID is needed for updating existing variants
                     attributes: { "Phân loại": detail.variantName || "Mặc định",
                                     "Đơn vị": detail.unit || "Cái"
                     },
@@ -47,15 +78,15 @@ const CreateProductModal = ({ open, onCancel, onSuccess }) => {
                 }))
             };
 
-            const res = await productApi.create(payload);
+            const res = await productApi.update(productId, payload);
             if (res.success) {
-                message.success('Thêm sản phẩm mới thành công!');
+                message.success('Cập nhật sản phẩm thành công!');
                 form.resetFields(); 
                 onSuccess();        
                 onCancel();         
             }
         } catch (error) {
-            message.error(error.message || 'Thêm sản phẩm thất bại!');
+            message.error(error.message || 'Cập nhật sản phẩm thất bại!');
         } finally {
             setSubmitting(false);
         }
@@ -63,7 +94,7 @@ const CreateProductModal = ({ open, onCancel, onSuccess }) => {
 
     return (
         <Modal
-            title="Thêm Sản phẩm mới"
+            title="Sửa Sản phẩm"
             open={open}
             width={800} // Cố định chiều rộng to ra để chứa bảng chi tiết
             onCancel={() => {
@@ -78,10 +109,8 @@ const CreateProductModal = ({ open, onCancel, onSuccess }) => {
             <Form 
                 form={form} 
                 layout="vertical" 
-                onFinish={handleCreateProduct} 
+                onFinish={handleUpdateProduct} 
                 style={{ marginTop: 20 }}
-                // Khởi tạo sẵn 1 dòng phân loại mặc định để người dùng đỡ phải bấm nút "Thêm" lần đầu
-                initialValues={{ details: [{ variantName: 'Mặc định', unit: 'Cái', costPrice: 0, price: 0, stockQuantity: 0 }] }}
             >
                 {/* THÔNG TIN CHUNG SẢN PHẨM */}
                 <Row gutter={16}>
@@ -177,4 +206,4 @@ const CreateProductModal = ({ open, onCancel, onSuccess }) => {
     );
 };
 
-export default CreateProductModal;
+export default UpdateProductModal;

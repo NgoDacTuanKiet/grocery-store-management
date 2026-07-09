@@ -3,10 +3,14 @@ import { Table, Card, Button, Space, Tag, Input, message } from 'antd';
 import { SearchOutlined, EyeOutlined, PrinterOutlined, PlusOutlined } from '@ant-design/icons';
 import { invoiceApi } from '../../services/invoiceApi';
 import CreateInvoiceDrawer from './CreateInvoice';
+import InvoiceDetailDrawer from './InvoiceDetail';
+import { printInvoiceData } from '../../utils/printUtils';
 
 const Invoices = () => {
     const [invoices, setInvoices] = useState([]);
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
+    const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [pagination, setPagination] = useState({
@@ -21,6 +25,7 @@ const Invoices = () => {
             const params = {
                 page: page - 1, 
                 size: size,
+                sort: 'createdAt,desc'
             };
             if (search) params.search = search;
 
@@ -28,7 +33,7 @@ const Invoices = () => {
             if (response.success) {
                 const pageData = response.data;
                 const dataList = pageData.content || pageData || [];
-                const totalItems = pageData.totalElements || dataList.length || 0;
+                const totalItems = response.metaData?.totalItems || dataList.length || 0;
 
                 setInvoices(dataList);
                 setPagination(prev => ({
@@ -55,6 +60,22 @@ const Invoices = () => {
 
     const handleSearch = () => {
         fetchInvoices(1, pagination.pageSize, searchText);
+    };
+
+    const handleDirectPrint = async (id) => {
+        const hide = message.loading('Đang chuẩn bị hóa đơn...', 0);
+        try {
+            const res = await invoiceApi.getById(id);
+            hide();
+            if (res.success) {
+                printInvoiceData(res.data);
+            } else {
+                message.error('Không thể lấy thông tin hóa đơn');
+            }
+        } catch (error) {
+            hide();
+            message.error(error.message || 'Lỗi lấy chi tiết hóa đơn');
+        }
     };
 
     // 1. CỘT CHO BẢNG CHÍNH (HÓA ĐƠN)
@@ -102,8 +123,8 @@ const Invoices = () => {
             align: 'center',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" icon={<EyeOutlined />} size="small" ghost onClick={() => message.info('Xem chi tiết')} />
-                    <Button type="default" icon={<PrinterOutlined />} size="small" onClick={() => message.info('In hóa đơn')} />
+                    <Button type="primary" icon={<EyeOutlined />} size="small" ghost onClick={() => { setSelectedInvoiceId(record.id); setIsDetailDrawerOpen(true); }} />
+                    <Button type="default" icon={<PrinterOutlined />} size="small" onClick={() => handleDirectPrint(record.id)} />
                 </Space>
             ),
         },
@@ -175,6 +196,11 @@ const Invoices = () => {
                 open={isCreateDrawerOpen} 
                 onClose={() => setIsCreateDrawerOpen(false)} 
                 onSuccess={() => fetchInvoices(1, pagination.pageSize, searchText)} 
+            />
+            <InvoiceDetailDrawer 
+                open={isDetailDrawerOpen} 
+                onClose={() => { setIsDetailDrawerOpen(false); setSelectedInvoiceId(null); }} 
+                invoiceId={selectedInvoiceId} 
             />
         </Card>
     );

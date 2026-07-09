@@ -54,4 +54,15 @@ public class ProductController {
                 .data(productService.createProduct(request))
                 .build();
     }
+
+     //Cập nhật sản phẩm (Chỉ OWNER)
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseDto<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
+        return ResponseDto.<ProductResponse>builder()
+                .success(true)
+                .message("Cập nhật sản phẩm thành công!")
+                .data(productService.updateProduct(id, request))
+                .build();
+    }
 }
